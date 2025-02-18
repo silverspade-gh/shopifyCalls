@@ -1,4 +1,4 @@
-import {createAdminApiClient} from '@shopify/admin-api-client';
+const { createAdminApiClient } = require('@shopify/admin-api-client');
 
 const client = createAdminApiClient({
   storeDomain: 'shop-storename.myshopify.com',
@@ -7,3 +7,4 @@ const client = createAdminApiClient({
 });
 
 module.exports = { client };
+
