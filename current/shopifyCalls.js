@@ -10,7 +10,52 @@ const shopifyMetaobjectURI = 'gid://shopify/Metaobject/';
 // Shopify Product IDs of listed products
 // This is a variable that needs manual updates for now.
 const shopifyProductIDs = {
-/* a private collection of product IDs */
+  sevenDayStarterKit: 8048084451587,
+  sevenDayStarterKitCustom: 8548174659843,
+  allInOneKit: 8001062732035,
+  allInOneKitCustom: 8438050717955,
+  aloeHydrationKit: 8114636980483,
+  aloeHydrationKitCustom: 8626870714627,
+  aloeVeraDrinkMix: 7601000612099,
+  appetiteSuppressant: 7601000677635,
+  bodyToner2x1: 8181958279427,
+  carbBlocker: 7633926193411,
+  collagen: 7601000743171,
+  colonCleanser: 7601000775939,
+  detoxPlusKit: 7979354128643,
+  detoxPlusKitCustom: 8548397809923,
+  drinkBoosterGreens: 7647125995779,
+  easyDigestion2x1: 8121877823747,
+  fatBurner2x1: 7954778489091,
+  foodLoverKit: 7983185035523,
+  foodLoverKitCustom: 8548406329603,
+  happyJoints2x1: 8145415012611,
+  heartBand: 7601001103619,
+  heartBandCard: 7601001136387,
+  laxativeTea: 8358596378883,
+  liverSuperCleanse2x1: 8239179727107,
+  mealReplacement15: 7601000841475,
+  menoPause2x1: 8349587144963,
+  motivationalWaterBottle: 8001513226499,
+  multiVitamin: 7601001332995,
+  naturalDetox: 7601001070851,
+  proteinBars: 7611445444867,
+  proteinBrownies: 8154863993091,
+  pureFiber: 8248682873091,
+  shakeBoosterCelluFit: 7601001595139,
+  shakeBoosterHighEnergy: 7601001627907,
+  shakeBoosterPureFiber: 7601001660675,
+  shakerBottle: 7601001693443,
+  sleepBurn2x1: 8062251696387,
+  slimDown: 7601001726211,
+  transformationKit: 7983124316419,
+  transformationKitCustom: 8548149559555,
+  transformationSupplementKit: 7601001791747,
+  waterLipoKit: 8529942708483,
+  waterLipo: 7960617419011,
+  waterLipoSpecial: 8111114256643,
+  waterLipoTea: 8154872086787,
+  wheyProtein30: 7601000972547
 }
 
 // Helper debugging function
@@ -137,24 +182,24 @@ async function queryProductList(numberOfProducts = 250) {
 // Custom query functionality is on the way.
 async function queryProduct(productId) {
 
-    const operation = `
-      query Product($id: ID!) {
-        product(id: $id) {
-          id
-          title
-          handle
-          description
-        }
+  const operation = `
+    query Product($id: ID!) {
+      product(id: $id) {
+        id
+        title
+        handle
+        description
       }
-    `;
+    }
+  `;
 
-    const {data, errors, extensions} = await client.request(operation, {
-      variables: {
-        id: `gid://shopify/Product/${productId}`,
-      },
-    });
+  const {data, errors, extensions} = await client.request(operation, {
+    variables: {
+      id: `gid://shopify/Product/${productId}`,
+    },
+  });
 
-    return data.product
+  return data.product
 }
 
 async function queryMetaobject(metaobjectId) {
@@ -208,6 +253,68 @@ async function queryProductNewDescription(productId) {
   });
 
   return data.product;
+}
+
+async function queryApp(appId) {
+  const operation = `
+    query App($id: ID!) {
+      app(id: $id) {
+        title
+      }
+    }
+  `;
+
+  const {data, errors, extensions} = await client.request(operation, {
+    variables: {
+      id: `gid://shopify/Product/${productId}`,
+    },
+  });
+
+  return data.app
+}
+
+// Needs pagination
+async function queryAppList(numberOfApps = 250) {
+  const operation = `
+    query AppList {
+      appInstallations(first: ${numberOfApps}) {
+        nodes {
+          app {
+            id
+            title
+          }
+        }
+      }
+    }
+  `;
+
+  const {data, errors, extensions} = await client.request(operation);
+
+  debug(data, errors);
+
+  return data.appInstallations.nodes;
+}
+
+// Needs pagination
+async function queryAppSalesChannels(numberOfChannels = 250) {
+  const operation = `
+    query AppSalesChannels {
+      publications(first: ${numberOfChannels}) {
+        nodes {
+          app {
+            id
+            title
+          }
+        }
+      }
+    }
+  `;
+
+  const {data, errors, extensions} = await client.request(operation);
+
+  debug(data, errors);
+
+  return data.publications;
 }
 
 // Change a product's description using 
@@ -270,6 +377,9 @@ module.exports = {
   queryShopDetails,
   queryProductNewDescription,
   queryMetaobject,
+  queryApp,
+  queryAppList,
+  queryAppSalesChannels,
   writeProductDescriptionToFile
   // queryProductDescription
 };
